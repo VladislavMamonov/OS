@@ -1,0 +1,119 @@
+#!/bin/bash
+
+
+function manual
+{
+  echo -e "\t\t**********Network settings manager**********"
+  echo ""
+  echo "Using this utility you can easily change the settings of network interfaces"
+
+  echo -e "\E[31m";
+  echo "net -print"
+  echo -e -n "\E[39m";
+  echo -e "\tShows the all network interfaces"
+
+  echo -e "\E[31m";
+  echo "net -on|off [interface]"
+  echo -e -n "\E[39m";
+  echo -e "\tOn\Off network interface"
+
+  echo -e "\E[31m";
+  echo "-q"
+  echo -e -n "\E[39m";
+  echo -e "\tExit"
+
+  echo -e "\n"
+  echo "Examples:"
+  echo -e "\E[36m";
+  echo "net -off eth0"
+  echo -e -n "\E[39m";
+  echo -e "\t Shutdown interface 'eth0'"
+}
+
+
+function net_print
+{
+  echo -n "Interface name"
+  echo -n -e "\E[29G"
+  echo -n "MAC address"
+  echo -n -e "\E[49G"
+  echo "Connection speed"
+
+  count_interfaces=0
+  i=1
+  n=1
+  interfaces_file=$(ls /sys/class/net)
+
+  for var in $interfaces_file
+  do
+    count_interfaces=$(( count_interfaces + 1 ))
+  done
+
+  while(( i <= $count_interfaces ))
+  do
+    if [[ $(ifconfig -a | head -n$n | tail -n1 | awk '{print($3)}') = "mtu" ]]
+      then interface_name=$(ls /sys/class/net | head -n$i | tail -n1 | awk '{print($i)}')
+      echo -n -e "$i $interface_name"
+    fi
+
+    speed=$(sudo ethtool $interface_name | grep 'Speed' | awk '{print($2)}')
+    if [[ $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "inet" || $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "ether" ]]
+      then
+        if [[ $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "ether" ]]
+          then echo -n -e "\E[29G"
+          echo -n "$(ifconfig -a | head -n$n | tail -n1 | awk '{print($2)}') "
+          echo -n -e "\E[49G"
+          echo "$speed"
+          i=$(( i + 1 ))
+        else
+          echo -n -e "\E[11G"
+          echo -n -e "$(ifconfig -a | head -n$n | tail -n1 | awk '{print($2)}') "
+          if [[ $(ls /sys/class/net | head -n$i | tail -n1 | awk '{print($i)}') = "lo" ]]
+            then echo -n -e "\E[49G"
+            echo "$speed"
+            i=$(( i + 1 ))
+            fi
+        fi
+    fi
+    n=$(( n+1 ))
+  done
+}
+
+
+function manage_net_status
+{
+  interface_name=${user_command:8}
+  if [[ "${user_command:4:8}" == *"-on "* ]]
+    then sudo ifconfig $interface_name up
+  else sudo ifconfig $interface_name down
+  fi
+}
+
+
+isExit=0
+
+while (( isExit != 1 ))
+do
+  user_command=0
+  read -p "command: " user_command
+
+  if [[ $user_command = "-q" ]]
+    then isExit=1
+    echo ""
+  else if [[ $user_command = "--help|-h" ]]
+    then manual
+    echo ""
+  else if [[ $user_command = "net -print" ]]
+    then net_print
+    echo ""
+  else if [[ ("${user_command:0:4}" == *"net "*) && (("${user_command:4:8}" == *"-on "*) || ("${user_command:4:8}" == *"-off "*)) ]]
+    then manage_net_status
+    echo ""
+  else echo "unknown command"
+    echo ""
+      fi
+    fi
+  fi
+fi
+
+done
