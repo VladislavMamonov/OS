@@ -35,9 +35,7 @@ function net_print
 {
   echo -n "Interface name"
   echo -n -e "\E[29G"
-  echo -n "MAC address"
-  echo -n -e "\E[49G"
-  echo "Connection speed"
+  echo "MAC address"
 
   count_interfaces=0
   i=1
@@ -56,21 +54,17 @@ function net_print
       echo -n -e "$i $interface_name"
     fi
 
-    speed=$(sudo ethtool $interface_name | grep 'Speed' | awk '{print($2)}')
     if [[ $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "inet" || $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "ether" ]]
       then
         if [[ $(ifconfig -a | head -n$n | tail -n1 | awk '{print($1)}') = "ether" ]]
           then echo -n -e "\E[29G"
-          echo -n "$(ifconfig -a | head -n$n | tail -n1 | awk '{print($2)}') "
-          echo -n -e "\E[49G"
-          echo "$speed"
+          echo "$(ifconfig -a | head -n$n | tail -n1 | awk '{print($2)}') "
           i=$(( i + 1 ))
         else
           echo -n -e "\E[11G"
           echo -n -e "$(ifconfig -a | head -n$n | tail -n1 | awk '{print($2)}') "
           if [[ $(ls /sys/class/net | head -n$i | tail -n1 | awk '{print($i)}') = "lo" ]]
-            then echo -n -e "\E[49G"
-            echo "$speed"
+            then echo ""
             i=$(( i + 1 ))
             fi
         fi
@@ -82,11 +76,19 @@ function net_print
 
 function manage_net_status
 {
-  interface_name=${user_command:8}
-  if [[ "${user_command:4:8}" == *"-on "* ]]
-    then sudo ifconfig $interface_name up
-  else sudo ifconfig $interface_name down
-  fi
+  arg_count=0
+
+  for var in $user_command
+  do
+    arg_count=$(( arg_count + 1 ))
+    if [[ $arg_count > 2 ]]
+      then
+      if [[ "${user_command:4:8}" == *"-on "* ]]
+        then sudo ifconfig $var up
+      else sudo ifconfig $var down
+      fi
+    fi
+  done
 }
 
 
