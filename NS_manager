@@ -6,6 +6,7 @@ function manual
   echo -e "\t\t**********Network settings manager**********"
   echo ""
   echo "Using this utility you can easily change the settings of network interfaces"
+  echo "Authors: Semyon Karulev, Vladislav Mamonov, Roman Suksin" 
 
   echo -e "\E[31m";
   echo "net -print"
