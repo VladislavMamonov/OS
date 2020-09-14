@@ -13,7 +13,7 @@ function manual
   echo -e "\tShows the all network interfaces"
 
   echo -e "\E[31m";
-  echo "net -on|off [interface]"
+  echo "net -on|-off [interface]"
   echo -e -n "\E[39m";
   echo -e "\tOn\Off network interface"
 
@@ -22,12 +22,27 @@ function manual
   echo -e -n "\E[39m";
   echo -e "\tExit"
 
+  echo -e "\E[31m";
+  echo "net -ip|-mask [interface] [address]"
+  echo -e -n "\E[39m";
+  echo -e "\tConfiguring IP/Mask/Gateway for a specific interface"
+
+  echo -e "\E[31m";
+  echo "net -gateway [address]"
+  echo -e -n "\E[39m";
+  echo -e "\tConfiguring gateway"
+
   echo -e "\n"
   echo "Examples:"
   echo -e "\E[36m";
   echo "net -off eth0"
   echo -e -n "\E[39m";
-  echo -e "\t Shutdown interface 'eth0'"
+  echo -e "\tShutdown interface 'eth0'"
+
+  echo -e "\E[36m";
+  echo "net -ip eth0 192.168.2.255"
+  echo -e -n "\E[39m";
+  echo -e "\tChange ip for interface 'eth0'"
 }
 
 
@@ -92,6 +107,29 @@ function manage_net_status
 }
 
 
+function manage_ip_mask
+{
+  interface_name=$(echo "$user_command" | awk '{print($3)}')
+  address=$(echo "$user_command" | awk '{print($4)}')
+
+  if [[ "${user_command:4:8}" == *"-ip "* ]]
+    then sudo ifconfig $interface_name $address
+  else if [[ "${user_command:4:10}" == *"-mask "* ]]
+    then sudo ifconfig $interface_name netmask $address
+    fi
+  fi
+}
+
+
+function manage_gateway
+{
+  address=$(echo "$user_command" | awk '{print($3)}')
+
+  sudo ip route del default via $(ip route | grep "default" | awk '{print $3}')
+  sudo ip route add default via $address
+}
+
+
 isExit=0
 
 while (( isExit != 1 ))
@@ -108,11 +146,19 @@ do
   else if [[ $user_command = "net -print" ]]
     then net_print
     echo ""
-  else if [[ ("${user_command:0:4}" == *"net "*) && (("${user_command:4:8}" == *"-on "*) || ("${user_command:4:8}" == *"-off "*)) ]]
+  else if [[ ("${user_command:0:4}" == *"net "*) && (("${user_command:4}" == *"-on "*) || ("${user_command:4}" == *"-off "*)) ]]
     then manage_net_status
     echo ""
-  else echo "unknown command"
+  else if [[ ("${user_command:0:4}" == *"net "*) && (("${user_command:4}" == *"-ip "*) || ("${user_command:4}" == *"-mask "*)) ]]
+    then manage_ip_mask
     echo ""
+  else if [[ ("${user_command:0:4}" == *"net "*) && ("${user_command:4}" == *"-gateway "*) ]]
+    then manage_gateway
+    echo ""
+  else echo "unknown command, use '--help|-h' for help"
+    echo ""
+          fi
+        fi
       fi
     fi
   fi
