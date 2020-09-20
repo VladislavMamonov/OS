@@ -1,23 +1,6 @@
 #include "FManager.hpp"
 
 
-int64_t GetFileSize(FILE *fd)
-{
-  int64_t _file_size = 0;
-
-  if (fd == NULL) {
-    _file_size = -1;
-    return 1;
-  }
-  else {
-    while(getc(fd) != EOF) _file_size++;
-    fclose(fd);
-  }
-
-  return _file_size;
-}
-
-
 int copy_file(char *src, char *dst)
 {
   FILE *from;
@@ -99,4 +82,36 @@ int print_dir(char *src)
 
   closedir(pDir);
   return 0;
+}
+
+
+off_t GetFileSize(char *src)
+{
+  struct stat buf;
+  FILE *fp;
+
+  if ((fp = fopen(src, "r")) == NULL)
+    return 1;
+
+  stat(src, &buf);
+  return buf.st_size;
+}
+
+
+off_t GetDirSize(char *src)   //todo
+{
+  off_t DirSize = 0;
+  struct dirent *pDirent;
+  DIR *pDir;
+
+  if ((pDir = opendir(src)) == NULL)
+    return 1;
+
+  while ((pDirent = readdir(pDir)) != NULL) {
+    DirSize += GetFileSize(pDirent->d_name);
+    cout << pDirent->d_name << "\t" << DirSize << endl;
+  }
+
+  closedir(pDir);
+  return DirSize;
 }
