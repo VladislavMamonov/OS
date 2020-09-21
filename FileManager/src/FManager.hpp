@@ -11,7 +11,10 @@ using namespace std;
 int copy_file(char *src, char *dst);
 int mv_file(char *src, char *dst);
 int remove_file(char *src);
-int print_dir(char *src);
 
+int print_dir(char *src);
 off_t GetFileSize(char *src);
 off_t GetDirSize(char *src);
+void print_processes();
+
+void about();
