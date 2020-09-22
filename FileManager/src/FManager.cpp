@@ -139,14 +139,14 @@ void print_processes()
       strcat(proc_path, "/status");            //Формируем путь к процессу
       FILE *proc_info = fopen(proc_path, "r");
 
-      char *proc_name = new char;
-      char *temp = new char;
+      char *proc_name = new char[100];
+      char *temp = new char[100];
 
       fscanf(proc_info, "%s%s", temp, proc_name);     //Извлекаем из файла "status" название процесса
       cout << pDirent->d_name << "\t" << proc_name << endl;
 
-      // delete proc_name;
-      // delete temp;
+      delete proc_name;
+      delete temp;
       fclose(proc_info);
     }
   }
