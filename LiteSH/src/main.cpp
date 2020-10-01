@@ -6,6 +6,10 @@ int main()
   bool isExit = false;
   string command;
 
+  SendMssg();
+  cout << endl << endl; 
+  RecvMssg();
+
   while (isExit != true) {
     cout << "command: ";
     getline(cin, command);
@@ -27,7 +31,7 @@ int main()
       proc_name = command.substr(15);
       strcpy(proc_name_buf, proc_name.c_str());
 
-      CreateProcess(proc_name_buf);
+      CreateDaemon(proc_name_buf);
 
       delete[] proc_name_buf;
     }
