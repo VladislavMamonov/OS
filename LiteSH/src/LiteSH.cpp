@@ -11,6 +11,8 @@ int CreateProcess(char *ProcName)
       perror("fork");
       return 1;
     case 0:
+      cout << "pid: " << getpid() << endl;
+      cout << "ppid: " << getppid() << endl;
       execv(arg[0], arg);
     default:
       wait(&rv);
@@ -31,6 +33,7 @@ int CreateDaemon(char *ProcName)
       return 1;
     case 0:
       setsid();
+      cout << "pid: " << getpid() << endl;
       cout << "ppid: " << getppid() << endl;
       chdir("/");
       fclose(stdin);
@@ -46,20 +49,20 @@ int CreateDaemon(char *ProcName)
 }
 
 
-int SendMssg()
+int SendMssg(const char *ProcName, const char *mssg)
 {
   key_t ipckey;
   int mq_id;
 
   struct { long type; char text[100]; } mymsg;
-  ipckey = ftok("/home/vladislav/.bash_history", 42);
+  ipckey = ftok(ProcName, 42);
   cout << "my key is " << ipckey << endl;
 
   mq_id = msgget(ipckey, IPC_CREAT | 0666);
   cout << "message identifier is " << mq_id << endl;
 
   memset(mymsg.text, 0, 100);
-  strcpy(mymsg.text, "Hello, world!");
+  strcpy(mymsg.text, mssg);
   mymsg.type = 1;
   msgsnd(mq_id, &mymsg, sizeof(mymsg), 0);
 
@@ -67,7 +70,7 @@ int SendMssg()
 }
 
 
-int RecvMssg()
+int RecvMssg(const char *ProcName)
 {
   key_t ipckey;
   int mq_id;
@@ -75,7 +78,7 @@ int RecvMssg()
   struct { long type; char text[100]; } mymsg;
   int received;
 
-  ipckey = ftok("/home/vladislav/.bash_history", 42);
+  ipckey = ftok(ProcName, 42);
   cout << "My key is " << ipckey << endl;
 
   /* Подключение к очереди */
@@ -87,4 +90,28 @@ int RecvMssg()
   cout << mymsg.text << "(" << received << ")" << endl;
 
   return 1;
+}
+
+
+void sighandler(int signo)
+{
+  cout << "Signal received successfully" << endl;
+}
+
+
+int SendSignal(pid_t pid, int signum)
+{
+  if (kill(pid, signum) == -1)
+    return 1;
+
+  return 0;
+}
+
+
+int RecvSignal(int signum)
+{
+  if (signal(signum, sighandler) == SIG_ERR)
+    return 1;
+
+  return 0;
 }
