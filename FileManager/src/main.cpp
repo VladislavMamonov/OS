@@ -29,6 +29,7 @@ int main()
   {
     int selection;
     cout << "\n\n" << "selection: ";
+    cin.clear();
     cin >> selection;
 
     switch (selection) {
@@ -133,6 +134,7 @@ int main()
         break;
 
       default:
+        cout << "shutdown" << endl;
         isExit = true;
         break;
     }

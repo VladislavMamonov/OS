@@ -34,9 +34,9 @@ int main()
   cout << "Press 2 to create daemon" << endl;
   cout << "Press 3 to send signal to the process" << endl;
   cout << "Press 4 to receive signal" << endl;
-  cout << "Press 5 to learn about project" << endl;
+  cout << "Press 5 to start FileManager" << endl;
+  cout << "Press 6 to learn about project" << endl;
   cout << "Press any key to exit" << endl << endl;
-
 
   while (isExit != true)
   {
@@ -94,6 +94,10 @@ int main()
       }
 
       case 5:
+        CreateProcess("/home/vladislav/OS/FileManager/bin/File_Manager"); //поменять на свой
+        break;
+
+      case 6:
         about();
         break;
 

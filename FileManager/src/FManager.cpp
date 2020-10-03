@@ -78,7 +78,7 @@ int print_dir(char *src)
     return 1;
 
   while ((pDirent = readdir(pDir)) != NULL)
-    cout << pDirent->d_name << endl;
+    cout << pDirent->d_ino << endl;
 
   closedir(pDir);
   return 0;
