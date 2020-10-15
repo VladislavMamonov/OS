@@ -28,21 +28,28 @@ void about()
 
 int main()
 {
+  pid_t server_pid = net_proc();
   bool isExit = false;
 
-  cout << "Press 1 to create process" << endl;
-  cout << "Press 2 to create daemon" << endl;
-  cout << "Press 3 to send signal to the process" << endl;
-  cout << "Press 4 to receive signal" << endl;
-  cout << "Press 5 to start FileManager" << endl;
-  cout << "Press 6 to learn about project" << endl;
-  cout << "Press any key to exit" << endl << endl;
+  cout << "Print 'CreateProcess' to create process" << endl;
+  cout << "Print 'CreateDaemon' to create daemon" << endl;
+  cout << "Print 'SendSignal' to send signal to the process" << endl;
+  cout << "Print 'RecvSignal' to receive signal" << endl;
+  cout << "Print 'FileManager' to start FileManager" << endl;
+  cout << "Print 'about' to learn about project" << endl;
+  cout << "Print 'exit' to close program" << endl << endl;
 
   while (isExit != true)
   {
     int selection = 0;
-    cout << "\n\n" << "selection: ";
-    cin >> selection;
+    char *command = new char[100];
+
+    cout << endl << endl;
+    cout << "command to server: ";
+    cin >> command;
+    cout << endl << endl;
+
+    selection = NetWorking_client(command);
 
     switch (selection) {
       case 1: {
@@ -53,7 +60,7 @@ int main()
         if (CreateProcess(ProcName) == 1)
           cout << "failed to create process" << endl;
 
-        delete[] ProcName;
+        delete [] ProcName;
         break;
       }
 
@@ -65,7 +72,7 @@ int main()
         if (CreateDaemon(ProcName) == 1)
           cout << "failed to create daemon" << endl;
 
-        delete[] ProcName;
+        delete [] ProcName;
         break;
       }
 
@@ -101,11 +108,12 @@ int main()
         about();
         break;
 
-      default:
+      case 7:
         isExit = true;
         break;
     }
   }
 
+  SendSignal(server_pid, SIGKILL);  // завершаем работу сервера
   return 0;
 }
