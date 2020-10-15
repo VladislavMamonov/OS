@@ -49,7 +49,9 @@ int main()
     cin >> command;
     cout << endl << endl;
 
+    cout << "--------------------------" << endl;
     selection = NetWorking_client(command);
+    cout << "--------------------------" << endl << endl;
 
     switch (selection) {
       case 1: {

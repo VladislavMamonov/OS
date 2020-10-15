@@ -182,12 +182,15 @@ int NetWorking_client(char *command)
   server.sin_port = htons(2019);
   server.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-  connect(sock, (struct sockaddr*)&server, sizeof(server));  // соединяемся с сервером
+  if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {   // соединяемся с сервером
+    cout << "connection failed" << endl;
+    return -1;
+  }
 
   char buf[100] = "";
   send(sock, command, sizeof(buf), 0);
   recv(sock, buf, sizeof(buf), 0);
-  cout << "received from server: " << buf << endl << endl;
+  cout << "received from server: " << buf << endl;
 
   close(sock);
 
