@@ -13,15 +13,17 @@ int main()
     return 1;
   }
 
-  void *p_func = dlsym(handle, "commands_guide");
+  typedef void (*p_func_commands_guide)();
+  typedef void (*p_func_about)();
+  p_func_commands_guide commands_guide = (p_func_commands_guide)dlsym(handle, "commands_guide");
+  p_func_about about = (p_func_about)dlsym(handle, "about");
 
   if ((error = dlerror()) != NULL) {
     fprintf (stderr, "%s\n", error);
     return 1;
   }
 
-  // void *commands_guide();
-  // commands_guide();
+  commands_guide();
 
   while (isExit != true)
   {
@@ -91,7 +93,7 @@ int main()
         break;
 
       case 6:
-        //about();
+        about();
         break;
 
       case 7:
