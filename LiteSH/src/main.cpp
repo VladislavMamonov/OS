@@ -1,43 +1,27 @@
 #include "LiteSH.hpp"
 
 
-void about()
-{
-  cout << "\t\t**********LiteSH**********" << endl;
-  cout << endl;
-  cout << "Using this utility you can easily create processes and daemons," << endl;
-  cout << "receive signals from external programs and the operating system" << endl;
-  cout << "and also send signals to other processes" << endl << endl;
-  cout <<  "Authors: Semyon Karulev, Vladislav Mamonov, Roman Suksin" << endl << endl;
-
-  ifstream signals("signals.txt");
-  string SigName;
-
-  cout << "Available signal numbers: " << endl;
-  cout << "---------------------------" << endl;
-
-  for (int i = 1; getline(signals, SigName); i++) {
-    cout << "\E[36m" << i << " - ";
-    cout << "\E[39m";
-    cout << SigName << endl;
-  }
-
-  signals.close();
-}
-
-
 int main()
 {
   pid_t server_pid = net_proc();
   bool isExit = false;
 
-  cout << "Print 'CreateProcess' to create process" << endl;
-  cout << "Print 'CreateDaemon' to create daemon" << endl;
-  cout << "Print 'SendSignal' to send signal to the process" << endl;
-  cout << "Print 'RecvSignal' to receive signal" << endl;
-  cout << "Print 'FileManager' to start FileManager" << endl;
-  cout << "Print 'about' to learn about project" << endl;
-  cout << "Print 'exit' to close program" << endl << endl;
+  char *error;
+  void *handle = dlopen("/home/vladislav/OS/LiteSH/lib/libabout.so", RTLD_LAZY);
+  if (!handle) {
+    fputs (dlerror(), stderr);
+    return 1;
+  }
+
+  void *p_func = dlsym(handle, "commands_guide");
+
+  if ((error = dlerror()) != NULL) {
+    fprintf (stderr, "%s\n", error);
+    return 1;
+  }
+
+  // void *commands_guide();
+  // commands_guide();
 
   while (isExit != true)
   {
@@ -107,7 +91,7 @@ int main()
         break;
 
       case 6:
-        about();
+        //about();
         break;
 
       case 7:
@@ -117,5 +101,6 @@ int main()
   }
 
   SendSignal(server_pid, SIGKILL);  // завершаем работу сервера
+  dlclose(handle);
   return 0;
 }

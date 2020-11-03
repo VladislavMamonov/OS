@@ -123,7 +123,7 @@ void NetWorking_server()
   int sock = socket(AF_INET, SOCK_STREAM, 0); // создание сокета
 
   // структура для сервера
-  server.sin_family = AF_INET;
+  server.sin_family = AF_INET;  // ipv4
   server.sin_addr.s_addr = INADDR_ANY; // 0.0.0.0
   server.sin_port = htons(2019); // порт сервера
 
