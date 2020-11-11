@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cstring>
+#include <fstream>
 #include <arpa/inet.h>
 #include <signal.h>
 #include <stdlib.h>

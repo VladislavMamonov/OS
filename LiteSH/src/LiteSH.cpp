@@ -206,7 +206,7 @@ pid_t net_proc()
   switch (pid = fork()) {
     case -1:
       perror("net fork");
-      return 1;
+      return -1;
     case 0:
       NetWorking_server();
   }
